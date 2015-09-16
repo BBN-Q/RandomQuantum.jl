@@ -25,20 +25,21 @@ type FubiniStudyPureState
 end
 
 function rand(dist::FubiniStudyPureState)
-  return normalize( randn(dist.dim)+ 1im*randn(dist.dim) )
+    return normalize( randn(dist.dim)+ 1im*randn(dist.dim) )
 end
 
 function rand(dist::FubiniStudyPureState, n::Int)
-  if n<1
-      error("Number of samples must be at least 1.")
-  end
-  return Vector[normalize( randn(dist.dim)+ 1im*randn(dist.dim) ) for _ in 1:n]
+    if n<1
+        error("Number of samples must be at least 1.")
+    end
+    return Vector[normalize( randn(dist.dim)+ 1im*randn(dist.dim) ) for _ in 1:n]
 end
 
-"""
+""" 
 Type corresponding to distribution of mixed states obtained by
 tracing out part of a pure state obtained from a FubiniStudy
-distribution.
+distribution. When `dim == bath_dim`, this is identical to the
+Hilbert-Schmidt distribution of mixed states. 
 """
 type FubiniStudyMixedState
     dim::Int64
@@ -46,7 +47,38 @@ type FubiniStudyMixedState
 end
 
 function rand(dist::FubiniStudyMixedState)
-  return trace(projector(rand(FubiniStudyPureState(dist.dim+dist.bath_dim))),[dist.dim,dist.bath_dim],2)
+    return trace(projector(rand(FubiniStudyPureState(dist.dim+dist.bath_dim))),[dist.dim,dist.bath_dim],2)
+end
+
+""" 
+Type corresponding to distribution of mixed states according to
+the Hilbert-Schmidt measure (induced by the Frobenius distance). This
+is identical to the mixed state distribution induced by tracing out
+half of a pure state distributed according to the Fubini-Study metric.
+"""
+type HilbertSchmidtState
+    dim::Int64
+end
+
+function rand(dist::HilbertSchmidtState)
+    X = randn(dist.dim)+1im*randn(dist.dim)
+    M = X*X'
+    return M/trace(M)
+end
+
+""" 
+Type corresponding to distribution of mixed states according to
+the Bures metric.
+"""
+type BuresState
+    dim::Int64
+end
+
+function rand(dist::BuresState)
+    G = randn(dist.dim)+1im*randn(dist.dim)
+    U = rand(HaarUnitary(dist.dim))
+    H = (eye(dist.dim)+U)*G
+    return H*H'/trace(H*H')
 end
 
 """
@@ -58,7 +90,8 @@ type HaarUnitary
 end
 
 function rand(dist::HaarUnitary)
-  return svd(randn(dist.dim,dist.dim)+1im*randn(dist.dim,dist.dim))[1]
+    # TODO: replace with call to RandomMatrices?
+    return svd(randn(dist.dim,dist.dim)+1im*randn(dist.dim,dist.dim))[1]
 end
 
 """
@@ -67,22 +100,22 @@ unitary transformations for system and bath, such that the bath
 (initially in the ground state) is traced out.
 """
 type HaarCPTPMap
-  dim::Int64
-  bath_dim::Int64
-  function HaarCPTPMap(dim,bath_dim)
-      if bath_dim <= 1
-          error("Bath must have dimension 2 or larger")
-      end
-  end
+    dim::Int64
+    bath_dim::Int64
+    function HaarCPTPMap(dim,bath_dim)
+        if bath_dim <= 1
+            error("Bath must have dimension 2 or larger")
+        end
+    end
 end
 
 function rand(dist::HaarCPTPMap)
-  ru = rand(HaarUnitary(dist.dim+dist.bath_dim)) * kron(eye(dist.dim),ket(0,dist.bath_dim))
-  k = Matrix{Complex128}[]
-  for ii=1:de
-    push!(k, kron(eye(d),bra(ii-1,de)) * ru )
-  end
-  kraus2liou(k)
+    ru = rand(HaarUnitary(dist.dim+dist.bath_dim)) * kron(eye(dist.dim),ket(0,dist.bath_dim))
+    k = Matrix{Complex128}[]
+    for ii=1:de
+        push!(k, kron(eye(d),bra(ii-1,de)) * ru )
+    end
+    kraus2liou(k)
 end
 
 """
@@ -117,12 +150,12 @@ type GUECPTPMap
 end
 
 function rand(GUECPTPMap)
-  ru = rand(GUEUnitary(dist.dim+dist.bath_dim)) * kron(eye(d),ket(0,de))
-  k = Matrix{Complex128}[]
-  for ii=1:de
-    push!(k, kron(eye(d),bra(ii-1,de)) * ru )
-  end
-  return kraus2liou(k)
+    ru = rand(GUEUnitary(dist.dim+dist.bath_dim)) * kron(eye(d),ket(0,de))
+    k = Matrix{Complex128}[]
+    for ii=1:de
+        push!(k, kron(eye(d),bra(ii-1,de)) * ru )
+    end
+    return kraus2liou(k)
 end
 
 end
