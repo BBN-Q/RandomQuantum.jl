@@ -1,4 +1,5 @@
 VERSION >= v"0.4.0-dev+6521" && __precompile__()
+
 module RandomQuantum
 
 using QuantumInfo
@@ -11,10 +12,10 @@ export  # types
         FubiniStudyMixedState,
         HilbertSchmidtMixedState,
         BuresMixedState,
-        HaarUnitary,
-        HaarCPTPMap,
-        GUEUnitary,
-        GUECPTPMap,
+        ClosedHaarEnsemble,
+        OpenHaarEnsemble,
+        ClosedEvolution,
+        OpenEvolution,
         # functions
         rand
 
@@ -42,7 +43,7 @@ type FubiniStudyPureState
 end
 
 function rand(dist::FubiniStudyPureState)
-    return normalize( rand(GinibreEnsemble(dist.size)) )
+    return normalize( vec(rand(GinibreEnsemble(dist.dim,1))) )
 end
 
 """ 
@@ -60,7 +61,8 @@ type FubiniStudyMixedState
 end
 
 function rand(dist::FubiniStudyMixedState)
-    return trace(projector(rand(FubiniStudyPureState(dist.dim+dist.bath_dim))),[dist.dim,dist.bath_dim],2)
+    ψ = rand(FubiniStudyPureState(dist.dim*dist.bath_dim))
+    return trace(projector(ψ),[dist.dim,dist.bath_dim],2)
 end
 
 """
@@ -95,7 +97,7 @@ end
 
 function rand(dist::BuresMixedState)
     G = rand(GinibreEnsemble(dist.dim))
-    U = rand(HaarUnitary(dist.dim))
+    U = rand(ClosedHaarEnsemble(dist.dim))
     H = (eye(dist.dim)+U)*G
     return H*H'/trace(H*H')
 end
@@ -106,12 +108,11 @@ transformations for some Hilbert space dimension.  See, e.g.,
 Mezzadri, [Notices Amer Math Soc 54 4 592
 (2007)](http://www.ams.org/notices/200705/fea-mezzadri-web.pdf).
 """
-type HaarUnitary 
+type ClosedHaarEnsemble
     dim::Int64 
 end
 
-function rand(dist::HaarUnitary)
-    # TODO: replace with call to RandomMatrices?
+function rand(dist::ClosedHaarEnsemble)
     X = rand(GinibreEnsemble(dist.dim))
     Q,_ = qr(X,thin=false)
     d = diag(Q)
@@ -128,21 +129,17 @@ See, e.g., Bruzda et al., [Phys. Lett. A 373, 320-324
 (2009)](http://dx.doi.org/10.1016/j.physleta.2008.11.043),
 [arXiv:0804.2361](http://arxiv.org/abs/0804.2361).
 """
-type HaarCPTPMap
+type OpenHaarEnsemble
     dim::Int64
     bath_dim::Int64
-    function HaarCPTPMap(dim,bath_dim)
-        if bath_dim <= 1
-            error("Bath must have dimension 2 or larger")
-        end
-    end
 end
 
-function rand(dist::HaarCPTPMap)
+function rand(dist::OpenHaarEnsemble)
     X = rand(GinibreEnsemble(dist.dim^2,dist.bath_dim))
     W = X*X'
     Y = sqrtm(trace(W,[dist.dim,dist.dim],1))
-    return (kron(eye(dist.dim),Y)\X)/kron(eye(dist.dim),Y)
+    R = kron(eye(dist.dim),sqrtm(Y))\X
+    return choi2liou(R*R')
 end
 
 """
@@ -162,7 +159,7 @@ end
 Type corresponding to the integrated evolution of random Hamiltonians
 (with unitarily invariant distribution) on some Hilbert space.
 """
-type GUEUnitary
+type RandomClosedEvolution
     dim::Int64
     α::Float64
 end
@@ -170,7 +167,7 @@ end
 # TODO: Instead of matrix exponentiation, could this be done by
 #       sampling eigenvalues, exponetiating them, and then multiplying
 #       by a Haar random unitary? If so, that should be cheaper
-function rand(dist::GUEUnitary)
+function rand(dist::RandomClosedEvolution)
     rh = rand(GUE(dist.dim))
     return expm(-1im*dist.α*rh)
 end
@@ -182,14 +179,14 @@ Hamiltonians (with unitarily invariant distribution) on a
 dimensional Hilbert space, such that bath (initially in the ground
 state) is traced out after the evolution.
 """
-type GUECPTPMap
+type RandomOpenEvolution
     dim::Int64
     bath_dim::Int64
     α::Float64
 end
 
-function rand(GUECPTPMap)
-    ru = rand(GUEUnitary(dist.dim+dist.bath_dim)) * kron(eye(d),ket(0,de))
+function rand(RandomOpenEvolution)
+    ru = rand(RandomClosedEvolution(dist.dim+dist.bath_dim)) * kron(eye(d),ket(0,de))
     k = Matrix{Complex128}[]
     for ii=1:de
         push!(k, kron(eye(d),bra(ii-1,de)) * ru )
