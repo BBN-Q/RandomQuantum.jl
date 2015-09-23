@@ -14,8 +14,8 @@ export  # types
         BuresMixedState,
         ClosedHaarEnsemble,
         OpenHaarEnsemble,
-        ClosedEvolution,
-        OpenEvolution,
+        RandomClosedEvolution,
+        RandomOpenEvolution,
         # functions
         rand
 
@@ -137,8 +137,13 @@ end
 function rand(dist::OpenHaarEnsemble)
     X = rand(GinibreEnsemble(dist.dim^2,dist.bath_dim))
     W = X*X'
+    println("W eigvals: $(eigvals(Hermitian(W)))")
     Y = sqrtm(trace(W,[dist.dim,dist.dim],1))
-    R = kron(eye(dist.dim),sqrtm(Y))\X
+    println("Y eigvals: $(eigvals(Hermitian(Y)))")
+    R = kron(eye(dist.dim),Y)\X
+    println("R*R': $(eigvals(R*R'))")
+    println("R*R': $(choi_liou_involution(R*R'))")
+    println("R*R': $(liou2pauliliou(choi_liou_involution(R*R')))")
     return choi2liou(R*R')
 end
 
@@ -168,8 +173,8 @@ end
 #       sampling eigenvalues, exponetiating them, and then multiplying
 #       by a Haar random unitary? If so, that should be cheaper
 function rand(dist::RandomClosedEvolution)
-    rh = rand(GUE(dist.dim))
-    return expm(-1im*dist.α*rh)
+    evals,U = eig(rand(GUE(dist.dim)))
+    return U*diagm(exp(-1im*dist.α*evals))*U'
 end
 
 """
@@ -185,8 +190,10 @@ type RandomOpenEvolution
     α::Float64
 end
 
-function rand(RandomOpenEvolution)
-    ru = rand(RandomClosedEvolution(dist.dim+dist.bath_dim)) * kron(eye(d),ket(0,de))
+function rand(dist::RandomOpenEvolution)
+    d = dist.dim
+    de = dist.bath_dim
+    ru = rand(RandomClosedEvolution(d*de,dist.α)) * kron(eye(d),ket(0,de))
     k = Matrix{Complex128}[]
     for ii=1:de
         push!(k, kron(eye(d),bra(ii-1,de)) * ru )

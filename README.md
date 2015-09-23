@@ -12,10 +12,10 @@ Type    | Ensemble
 `FubiniStudyMixedState` | Mixed-state ensemble induced by tracing out elements of Fubini-Study ensenble on a larger space
 `HilbertSchmidtMixedState` | Mixed-state ensemble given by the "flat" Hilbert-Schmidt 
 `BuresMixedState` | Mixed-state ensemble given by the Bures metric.
-`HaarUnitary` | Circular Unitary Ensemble (CUE)
-`HaarCPTPMap` | Quantum channel ensemble induced by Haar-distributed unitaries on a larger space.
-`GUEUnitary` | Unitary matrix ensemble obtained by evolving under a Hamiltonian sampled from a Gaussian unitary ensemble
-`GUECPTPMap` | Quantum channel ensemble induced by integrated GUE evolution on a larger space.
+`ClosedHaarEnsemble` | Circular Unitary Ensemble (CUE), unitaries distributed according to the Haar measure.
+`OpenHaarEnsemble` | Quantum channel ensemble induced by Haar-distributed unitaries (CUE) on a larger space.
+`RandomClosedEvolution` | Unitary matrix ensemble obtained by evolving under a Hamiltonian sampled from a Gaussian unitary ensemble
+`RandomOpenEvolution` | Quantum channel ensemble induced by integrated GUE evolution on a larger space.
 
 The interface is emulates the interface of `Distributions.jl`,
 although there is a lot missing at the moment.

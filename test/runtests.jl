@@ -62,14 +62,33 @@ for _ in 1:10
     @test_approx_eq_eps abs(eigvals(U)) ones(d) 1e-14
 end
 
-#OpenHaarEnsemble
-for _ in 1:10
-    d = rand(2:10)
-    db = rand(2:10)
-    E = rand(OpenHaarEnsemble(d,db))
-    @test ischannel(E)
-end
+# #OpenHaarEnsemble
+# for _ in 1:10
+#     d = 2 # rand(2:10)
+#     db = rand(2:10)
+#     E = rand(OpenHaarEnsemble(d,db))
+#     println(E)
+#     @test istp(E,tol=1e-14)
+#     @test iscp(E,tol=1e-14)
+#     @test ischannel(E,tol=1e-14)
+# end
 
 #ClosedEvolution
+for _ in 1:10
+    α = rand()
+    d = rand(2:10)
+    U = rand(RandomClosedEvolution(d,α))
+    @test_approx_eq_eps norm(U*U'-eye(d)) 0.0 1e-14
+    @test_approx_eq_eps norm(U'*U-eye(d)) 0.0 1e-14
+    @test_approx_eq_eps abs(eigvals(U)) ones(d) 1e-14
+end
+
 #OpenEvolution
+for _ in 1:10
+    α = rand()
+    d = rand(2:10)
+    db = rand(2:10)
+    E = rand(RandomOpenEvolution(d,db,α))
+    @test ischannel(E,tol=1e-14)
+end
 
