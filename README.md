@@ -53,6 +53,15 @@ Physics, 52, 062201 (2011)](http://dx.doi.org/10.1063/1.3595693)
 
 MIT License
 
+# Acknowledgements
+
+This research was funded by the Intelligence Advanced Research
+Projects Activity (IARPA) Multi Qubit Coherent Operations (MQCO)
+program under Contract No. W911NF-10-1-0324. All statements of fact,
+opinion, or conclusions contained herein are those of the authors and
+should not be construed as representing the official views or policies
+of IARPA, ODNI, or the US Government.
+
 # Copyright
 
 (c) Raytheon BBN Technologies, 2015

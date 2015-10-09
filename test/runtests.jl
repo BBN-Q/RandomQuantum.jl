@@ -1,10 +1,5 @@
-using RandomQuantum, QuantumInfo
+using QuantumInfo, RandomQuantum, SchattenNorms
 using Base.Test
-
-# in SchattenNorms, but here to remove dependency
-function trnorm(m::Matrix) 
-  sum(svdvals(m))
-end
 
 #@testloop "Randomized GinUE tests" 
 for _ in 1:10
