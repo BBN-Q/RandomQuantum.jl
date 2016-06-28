@@ -1,5 +1,7 @@
-using QuantumInfo, RandomQuantum, SchattenNorms
+using QuantumInfo, RandomQuantum
 using Base.Test
+
+trnorm(A) = trace(sqrtm(A*A'))
 
 #@testloop "Randomized GinUE tests" 
 for _ in 1:10
@@ -62,16 +64,15 @@ for _ in 1:10
     @test_approx_eq_eps abs(eigvals(U)) ones(d) 1e-12
 end
 
-# #OpenHaarEnsemble
-# for _ in 1:10
-#     d = 2 # rand(2:10)
-#     db = rand(2:10)
-#     E = rand(OpenHaarEnsemble(d,db))
-#     println(E)
-#     @test istp(E,tol=1e-14)
-#     @test iscp(E,tol=1e-14)
-#     @test ischannel(E,tol=1e-14)
-# end
+#OpenHaarEnsemble
+for _ in 1:10
+    d = 2 # rand(2:10)
+    db = rand(2:10)
+    E = rand(OpenHaarEnsemble(d,db))
+    @test istp(E,tol=1e-14)
+    @test iscp(E,tol=1e-14)
+    @test ischannel(E,tol=1e-14)
+end
 
 #ClosedEvolution
 for _ in 1:10

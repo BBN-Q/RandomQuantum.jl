@@ -20,6 +20,8 @@ export  # types
         rand
 
 """
+RandomQuantum.GinibreEnsemble(rows,cols)
+
 Type corresponding to the Ginibre distribution
 of complex matrices.
 """
@@ -35,6 +37,8 @@ function rand(dist::GinibreEnsemble)
 end
 
 """
+RandomQuantum.FubiniStudyPureState(dim)
+
 Type corresponding to unitarily-invariant distribution
 of pure states for some Hilbert space dimension.
 """
@@ -47,6 +51,8 @@ function rand(dist::FubiniStudyPureState)
 end
 
 """ 
+RandomQuantum.FubiniStudyMixedState(dim, bath_dim)
+
 Type corresponding to distribution of mixed states obtained by
 tracing out part of a pure state obtained from a FubiniStudy
 distribution. When `dim == bath_dim`, this is identical to the
@@ -66,6 +72,8 @@ function rand(dist::FubiniStudyMixedState)
 end
 
 """
+RandomQuantum.HilbertSchmidtState(dim)
+
 Type corresponding to distribution of mixed states according to the
 Hilbert-Schmidt measure (induced by the Frobenius distance). This is
 identical to the mixed state distribution induced by tracing out half
@@ -85,6 +93,8 @@ function rand(dist::HilbertSchmidtMixedState)
 end
 
 """ 
+RandomQuantum.BuresMixedState(dim)
+
 Type corresponding to distribution of mixed states according to the
 Bures metric. 
 See, e.g., Zyczkowski et al., [J. Math. Phys. 52, 062201
@@ -103,6 +113,8 @@ function rand(dist::BuresMixedState)
 end
 
 """ 
+RandomQuantum.ClosedHaarEnsemble(dim)
+
 Type corresponding to the unitarily invariant distribution of unitary
 transformations for some Hilbert space dimension.  See, e.g.,
 Mezzadri, [Notices Amer Math Soc 54 4 592
@@ -122,6 +134,8 @@ function rand(dist::ClosedHaarEnsemble)
 end
 
 """
+RandomQuantum.OpenHaarEnsemble(dim, bath_dim)
+
 Type corresponding to the unitarily invariant distribution of
 unitary transformations for system and bath, such that the bath
 (initially in the ground state) is traced out.
@@ -137,17 +151,18 @@ end
 function rand(dist::OpenHaarEnsemble)
     X = rand(GinibreEnsemble(dist.dim^2,dist.bath_dim))
     W = X*X'
-    println("W eigvals: $(eigvals(Hermitian(W)))")
-    Y = sqrtm(trace(W,[dist.dim,dist.dim],1))
-    println("Y eigvals: $(eigvals(Hermitian(Y)))")
-    R = kron(eye(dist.dim),Y)\X
-    println("R*R': $(eigvals(R*R'))")
-    println("R*R': $(choi_liou_involution(R*R'))")
-    println("R*R': $(liou2pauliliou(choi_liou_involution(R*R')))")
-    return choi2liou(R*R')
+    W = W/trace(W)
+    #Y = sqrtm(trace(W,[dist.dim,dist.dim],1))
+    #IY = kron(eye(dist.dim),Y)
+    Y = sqrtm(trace(W,[dist.dim,dist.dim],2))
+    IY = kron(Y,eye(dist.dim))
+    R = IY\W/IY
+    return choi2liou(R)/dist.dim
 end
 
 """
+RandomQuantum.GUE(dim)
+
 Type corresponding to the Gaussian Unitary Ensemble of complex
 matrices.  
 """
@@ -161,6 +176,8 @@ function rand(dist::GUE)
 end
 
 """
+RandomQuantum.RandomClosedEvolution(dim, α)
+
 Type corresponding to the integrated evolution of random Hamiltonians
 (with unitarily invariant distribution) on some Hilbert space.
 """
@@ -178,6 +195,8 @@ function rand(dist::RandomClosedEvolution)
 end
 
 """
+RandomQuantum.RandomOpenEvolution(dim, bath_dim, α)
+
 Type corresponding to the distribution of completely positive trace
 preserving maps obtained from the integrated evolution of random
 Hamiltonians (with unitarily invariant distribution) on a
