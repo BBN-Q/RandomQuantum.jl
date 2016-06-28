@@ -1,7 +1,7 @@
 using QuantumInfo, RandomQuantum
 using Base.Test
 
-trnorm(A) = trace(sqrtm(A*A'))
+trnorm(A) = sum(svdvals(A))
 
 #@testloop "Randomized GinUE tests" 
 for _ in 1:10
