@@ -1,6 +1,6 @@
 # RandomQuantum
 
-This package provides functions to sample from various random matrix ensebles
+This Julia package provides functions to sample from various random matrix ensebles
 associated with quantum information applications.
 
 Here is a table of currently support ensembles:
