@@ -2,7 +2,7 @@ VERSION >= v"0.4.0-dev+6521" && __precompile__()
 
 module RandomQuantum
 
-using QuantumInfo
+using Compat, QuantumInfo
 
 import Base.rand
 
@@ -68,7 +68,7 @@ end
 
 function rand(dist::FubiniStudyMixedState)
     ψ = rand(FubiniStudyPureState(dist.dim*dist.bath_dim))
-    return trace(projector(ψ),[dist.dim,dist.bath_dim],2)
+    return partialtrace(projector(ψ),[dist.dim,dist.bath_dim],2)
 end
 
 """
@@ -154,7 +154,7 @@ function rand(dist::OpenHaarEnsemble)
     W = W/trace(W)
     #Y = sqrtm(trace(W,[dist.dim,dist.dim],1))
     #IY = kron(eye(dist.dim),Y)
-    Y = sqrtm(trace(W,[dist.dim,dist.dim],2))
+    Y = sqrtm(partialtrace(W,[dist.dim,dist.dim],2))
     IY = kron(Y,eye(dist.dim))
     R = IY\W/IY
     return choi2liou(R)/dist.dim
