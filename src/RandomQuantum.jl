@@ -1,9 +1,7 @@
-VERSION >= v"0.4.0-dev+6521" && __precompile__()
-
 module RandomQuantum
 
-using Compat, QuantumInfo
-
+using  QuantumInfo
+import LinearAlgebra
 import Base.rand
 
 export  # types
@@ -19,13 +17,18 @@ export  # types
         # functions
         rand
 
+function eig(m)
+    r = LinearAlgebra.eigen(m)
+    return (r.values, r.vectors)
+end
+
 """
 RandomQuantum.GinibreEnsemble(rows,cols)
 
 Type corresponding to the Ginibre distribution
 of complex matrices.
 """
-type GinibreEnsemble
+struct GinibreEnsemble
     rows::Int64
     cols::Int64
 end
@@ -42,26 +45,26 @@ RandomQuantum.FubiniStudyPureState(dim)
 Type corresponding to unitarily-invariant distribution
 of pure states for some Hilbert space dimension.
 """
-type FubiniStudyPureState
+struct FubiniStudyPureState
     dim::Int64
 end
 
 function rand(dist::FubiniStudyPureState)
-    return normalize( vec(rand(GinibreEnsemble(dist.dim,1))) )
+    return LinearAlgebra.normalize( vec(rand(GinibreEnsemble(dist.dim,1))) )
 end
 
-""" 
+"""
 RandomQuantum.FubiniStudyMixedState(dim, bath_dim)
 
 Type corresponding to distribution of mixed states obtained by
 tracing out part of a pure state obtained from a FubiniStudy
 distribution. When `dim == bath_dim`, this is identical to the
-Hilbert-Schmidt distribution of mixed states. 
+Hilbert-Schmidt distribution of mixed states.
 See, e.g., Zyczkowski et al., [J. Math. Phys. 52, 062201
 (2011)](http://dx.doi.org/10.1063/1.3595693)
 [arXiv:1010.3570](http://arxiv.org/abs/1010.3570).
 """
-type FubiniStudyMixedState
+struct FubiniStudyMixedState
     dim::Int64
     bath_dim::Int64
 end
@@ -82,37 +85,37 @@ See, e.g., Zyczkowski et al., [J. Math. Phys. 52, 062201
 (2011)](http://dx.doi.org/10.1063/1.3595693)
 [arXiv:1010.3570](http://arxiv.org/abs/1010.3570).
 """
-type HilbertSchmidtMixedState
+struct HilbertSchmidtMixedState
     dim::Int64
 end
 
 function rand(dist::HilbertSchmidtMixedState)
     X = rand(GinibreEnsemble(dist.dim))
     M = X*X'
-    return M/trace(M)
+    return M/LinearAlgebra.tr(M)
 end
 
-""" 
+"""
 RandomQuantum.BuresMixedState(dim)
 
 Type corresponding to distribution of mixed states according to the
-Bures metric. 
+Bures metric.
 See, e.g., Zyczkowski et al., [J. Math. Phys. 52, 062201
 (2011)](http://dx.doi.org/10.1063/1.3595693)
 [arXiv:1010.3570](http://arxiv.org/abs/1010.3570).
 """
-type BuresMixedState
+struct BuresMixedState
     dim::Int64
 end
 
 function rand(dist::BuresMixedState)
     G = rand(GinibreEnsemble(dist.dim))
     U = rand(ClosedHaarEnsemble(dist.dim))
-    H = (eye(dist.dim)+U)*G
-    return H*H'/trace(H*H')
+    H = (QuantumInfo.eye(dist.dim)+U)*G
+    return H*H'/LinearAlgebra.tr(H*H')
 end
 
-""" 
+"""
 RandomQuantum.ClosedHaarEnsemble(dim)
 
 Type corresponding to the unitarily invariant distribution of unitary
@@ -120,15 +123,15 @@ transformations for some Hilbert space dimension.  See, e.g.,
 Mezzadri, [Notices Amer Math Soc 54 4 592
 (2007)](http://www.ams.org/notices/200705/fea-mezzadri-web.pdf).
 """
-type ClosedHaarEnsemble
-    dim::Int64 
+struct ClosedHaarEnsemble
+    dim::Int64
 end
 
 function rand(dist::ClosedHaarEnsemble)
     X = rand(GinibreEnsemble(dist.dim))
-    Q,_ = qr(X,thin=false)
-    d = diag(Q)
-    d = d./abs(d)
+    Q,_ = LinearAlgebra.qr(X)
+    d = LinearAlgebra.diag(Q)
+    d = d./abs.(d)
     Q = Q./d
     return Q
 end
@@ -143,7 +146,7 @@ See, e.g., Bruzda et al., [Phys. Lett. A 373, 320-324
 (2009)](http://dx.doi.org/10.1016/j.physleta.2008.11.043),
 [arXiv:0804.2361](http://arxiv.org/abs/0804.2361).
 """
-type OpenHaarEnsemble
+struct OpenHaarEnsemble
     dim::Int64
     bath_dim::Int64
 end
@@ -151,11 +154,11 @@ end
 function rand(dist::OpenHaarEnsemble)
     X = rand(GinibreEnsemble(dist.dim^2,dist.bath_dim))
     W = X*X'
-    W = W/trace(W)
-    #Y = sqrtm(trace(W,[dist.dim,dist.dim],1))
-    #IY = kron(eye(dist.dim),Y)
-    Y = sqrtm(partialtrace(W,[dist.dim,dist.dim],2))
-    IY = kron(Y,eye(dist.dim))
+    W = W/LinearAlgebra.tr(W)
+    #Y = sqrt(LinearAlgebra.tr(W,[dist.dim,dist.dim],1))
+    #IY = kron(QuantumInfo.eye(dist.dim),Y)
+    Y = sqrt(partialtrace(W,[dist.dim,dist.dim],2))
+    IY = kron(Y,QuantumInfo.eye(dist.dim))
     R = IY\W/IY
     return choi2liou(R)/dist.dim
 end
@@ -164,9 +167,9 @@ end
 RandomQuantum.GUE(dim)
 
 Type corresponding to the Gaussian Unitary Ensemble of complex
-matrices.  
+matrices.
 """
-type GUE 
+struct GUE
     size::Int64
 end
 
@@ -181,7 +184,7 @@ RandomQuantum.RandomClosedEvolution(dim, α)
 Type corresponding to the integrated evolution of random Hamiltonians
 (with unitarily invariant distribution) on some Hilbert space.
 """
-type RandomClosedEvolution
+struct RandomClosedEvolution
     dim::Int64
     α::Float64
 end
@@ -191,7 +194,7 @@ end
 #       by a Haar random unitary? If so, that should be cheaper
 function rand(dist::RandomClosedEvolution)
     evals,U = eig(rand(GUE(dist.dim)))
-    return U*diagm(exp(-1im*dist.α*evals))*U'
+    return U*LinearAlgebra.diagm(0 => exp.(-1im*dist.α*evals))*U'
 end
 
 """
@@ -203,7 +206,7 @@ Hamiltonians (with unitarily invariant distribution) on a
 dimensional Hilbert space, such that bath (initially in the ground
 state) is traced out after the evolution.
 """
-type RandomOpenEvolution
+struct RandomOpenEvolution
     dim::Int64
     bath_dim::Int64
     α::Float64
@@ -212,10 +215,10 @@ end
 function rand(dist::RandomOpenEvolution)
     d = dist.dim
     de = dist.bath_dim
-    ru = rand(RandomClosedEvolution(d*de,dist.α)) * kron(eye(d),ket(0,de))
-    k = Matrix{Complex128}[]
+    ru = rand(RandomClosedEvolution(d*de,dist.α)) * kron(QuantumInfo.eye(d),ket(0,de))
+    k = Matrix{ComplexF64}[]
     for ii=1:de
-        push!(k, kron(eye(d),bra(ii-1,de)) * ru )
+        push!(k, kron(QuantumInfo.eye(d), bra(ii-1,de)) * ru )
     end
     return kraus2liou(k)
 end
