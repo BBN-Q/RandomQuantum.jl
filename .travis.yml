@@ -1,17 +1,23 @@
 language: julia
+
+os:
+  - osx
+  - linux
+
 julia:
-  - 0.4
-  - 0.5
+  - 0.7
+  - 1.0
   - nightly
-matrix:
-  allowed_failures:
-    - julia: nightly
+# matrix:
+#   allowed_failures:
+#     - julia: nightly
+
 notifications:
   email: false
 # uncomment the following lines to override the default test script
-#script:
-#  - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-#  - julia --check-bounds=yes -e 'Pkg.clone(pwd()); Pkg.build("RandomQuantum"); Pkg.test("RandomQuantum"; coverage=true)'
+script:
+    - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
+    - julia --check-bounds=yes --color=yes -e 'using Pkg; Pkg.develop("Cliffords"); Pkg.develop(Pkg.PackageSpec(url="https://github.com/jlapeyre/QuantumInfo.jl/tree/upgradev1.0")); Pkg.clone(pwd()); Pkg.build("RandomQuantum"); Pkg.test("RandomQuantum"; coverage=true)'
 
 # necessary to run on new container-based infrastructure
 sudo: false
