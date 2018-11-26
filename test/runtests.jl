@@ -1,9 +1,13 @@
 using QuantumInfo, RandomQuantum
-using Base.Test
+import LinearAlgebra
+import StatsBase
+import StatsBase: var
 
-trnorm(A) = sum(svdvals(A))
+using Test
 
-#@testloop "Randomized GinUE tests" 
+trnorm(A) = sum(LinearAlgebra.svdvals(A))
+
+@testset "Randomized GinUE tests" begin
 for _ in 1:10
     rows = rand(2:10)
     cols = rand(1:10)
@@ -11,60 +15,66 @@ for _ in 1:10
     @test var(vec(real(X))) > 0
     @test var(vec(imag(X))) > 0
 end
+end
 
-#@testloop "Randomized FubiniStudyEnsemble tests" 
+@testset "Randomized FubiniStudyEnsemble tests" begin
 for _ in 1:10
     d = rand(2:10)
     ψ = rand(FubiniStudyPureState(d))
     @test var(real(ψ)) > 0
     @test var(imag(ψ)) > 0
-    @test_approx_eq norm(ψ) 1.0
+    @test isapprox(LinearAlgebra.norm(ψ), 1.0)
+end
 end
 
-#@testloop "Randomized FSOE tests" 
+@testset "Randomized FSOE tests" begin
 for _ in 1:10
     d = rand(2:10)
     db = rand(2:10)
     ρ = rand(FubiniStudyMixedState(d,db))
-    @test_approx_eq trnorm(ρ) 1
-    @test ishermitian(ρ)
+    @test isapprox(trnorm(ρ), 1)
+    @test LinearAlgebra.ishermitian(ρ)
     @test ispossemidef(ρ)
     @test var(vec(real(ρ))) > 0
     @test var(vec(imag(ρ))) > 0
 end
+end
 
-#@testloop "Randomized HSOE tests" 
+@testset "Randomized HSOE tests" begin
 for _ in 1:10
     d = rand(2:10)
     ρ = rand(HilbertSchmidtMixedState(d))
-    @test_approx_eq trnorm(ρ) 1
-    @test ishermitian(ρ)
+    @test isapprox(trnorm(ρ), 1)
+    @test LinearAlgebra.ishermitian(ρ)
     @test ispossemidef(ρ)
     @test var(vec(real(ρ))) > 0
     @test var(vec(imag(ρ))) > 0
 end
+end
 
-#BuresMixedState
+@testset "BuresMixedState" begin
 for _ in 1:10
     d = rand(2:10)
     ρ = rand(BuresMixedState(d))
-    @test_approx_eq trnorm(ρ) 1
-    @test ishermitian(ρ)
+    @test isapprox(trnorm(ρ), 1)
+    @test LinearAlgebra.ishermitian(ρ)
     @test ispossemidef(ρ)
     @test var(vec(real(ρ))) > 0
     @test var(vec(imag(ρ))) > 0
 end
+end
 
-#ClosedHaarEnsemble
+@testset "ClosedHaarEnsemble" begin
 for _ in 1:10
     d = rand(2:10)
     U = rand(ClosedHaarEnsemble(d))
-    @test_approx_eq_eps norm(U*U'-eye(d)) 0.0 1e-12
-    @test_approx_eq_eps norm(U'*U-eye(d)) 0.0 1e-12
-    @test_approx_eq_eps abs(eigvals(U)) ones(d) 1e-12
+    @test isapprox(U*U', QuantumInfo.eye(d), atol=1e-12)
+    @test isapprox(U'*U, QuantumInfo.eye(d), atol=1e-12)
+    @test isapprox(abs.(LinearAlgebra.eigvals(U)),  ones(d), atol=1e-12)
+end
 end
 
-#OpenHaarEnsemble
+@testset "OpenHaarEnsemble" begin
 for _ in 1:10
     d = 2 # rand(2:10)
     db = rand(2:10)
@@ -73,18 +83,20 @@ for _ in 1:10
     @test iscp(E,tol=1e-14)
     @test ischannel(E,tol=1e-14)
 end
+end
 
-#ClosedEvolution
+@testset "ClosedEvolution" begin
 for _ in 1:10
     α = rand()
     d = rand(2:10)
     U = rand(RandomClosedEvolution(d,α))
-    @test_approx_eq_eps norm(U*U'-eye(d)) 0.0 1e-12
-    @test_approx_eq_eps norm(U'*U-eye(d)) 0.0 1e-12
-    @test_approx_eq_eps abs(eigvals(U)) ones(d) 1e-12
+    @test isapprox(U*U', QuantumInfo.eye(d), atol=1e-12)
+    @test isapprox(U'*U, QuantumInfo.eye(d), atol=1e-12)
+    @test isapprox(abs.(LinearAlgebra.eigvals(U)), ones(d), atol=1e-12)
+end
 end
 
-#OpenEvolution
+@testset "OpenEvolution" begin
 for _ in 1:10
     α = rand()
     d = rand(2:10)
@@ -92,4 +104,4 @@ for _ in 1:10
     E = rand(RandomOpenEvolution(d,db,α))
     @test ischannel(E,tol=1e-12)
 end
-
+end

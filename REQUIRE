@@ -1,3 +1,4 @@
-julia 0.4
-QuantumInfo 0.0.2
-Compat
+julia 1.0
+QuantumInfo
+StatsBase
+Cliffords
