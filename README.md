@@ -22,6 +22,16 @@ Type    | Ensemble
 The interface is emulates the interface of `Distributions.jl`,
 although there is a lot missing at the moment.
 
+# Installation
+
+Install it with the following command:
+
+	  julia> Pkg.add("RandomQuantum")
+	  
+For Julia v1.0 use the master branch:
+
+	  (v1.0) pkg> add RandomQuantum#master
+     
 # Examples
 
 ```julia
