@@ -1,5 +1,7 @@
 # RandomQuantum
 
+[![Build Status](https://travis-ci.org/BBN-Q/RandomQuantum.jl.svg?branch=master)](https://travis-ci.org/BBN-Q/RandomQuantum.jl)
+
 This Julia package provides functions to sample from various random matrix ensebles
 associated with quantum information applications.
 
