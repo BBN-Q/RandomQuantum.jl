@@ -1,7 +1,8 @@
 module RandomQuantum
 
 using  QuantumInfo
-import LinearAlgebra
+import QuantumInfo: eye
+using LinearAlgebra: tr, eigen, normalize, qr, diag, diagm
 import Base.rand
 
 export  # types
@@ -18,7 +19,7 @@ export  # types
         rand
 
 function eig(m)
-    r = LinearAlgebra.eigen(m)
+    r = eigen(m)
     return (r.values, r.vectors)
 end
 
@@ -50,7 +51,7 @@ struct FubiniStudyPureState
 end
 
 function rand(dist::FubiniStudyPureState)
-    return LinearAlgebra.normalize( vec(rand(GinibreEnsemble(dist.dim,1))) )
+    return normalize( vec(rand(GinibreEnsemble(dist.dim,1))) )
 end
 
 """
@@ -92,7 +93,7 @@ end
 function rand(dist::HilbertSchmidtMixedState)
     X = rand(GinibreEnsemble(dist.dim))
     M = X*X'
-    return M/LinearAlgebra.tr(M)
+    return M/tr(M)
 end
 
 """
@@ -111,8 +112,8 @@ end
 function rand(dist::BuresMixedState)
     G = rand(GinibreEnsemble(dist.dim))
     U = rand(ClosedHaarEnsemble(dist.dim))
-    H = (QuantumInfo.eye(dist.dim)+U)*G
-    return H*H'/LinearAlgebra.tr(H*H')
+    H = (eye(dist.dim)+U)*G
+    return H*H'/tr(H*H')
 end
 
 """
@@ -129,10 +130,10 @@ end
 
 function rand(dist::ClosedHaarEnsemble)
     X = rand(GinibreEnsemble(dist.dim))
-    Q,_ = LinearAlgebra.qr(X)
-    d = LinearAlgebra.diag(Q)
-    d = d./abs.(d)
-    Q = Q./d
+    Q,_ = qr(X)
+    d = diag(Q)
+    d = d ./ abs.(d)
+    Q = Q ./ d
     return Q
 end
 
@@ -154,11 +155,11 @@ end
 function rand(dist::OpenHaarEnsemble)
     X = rand(GinibreEnsemble(dist.dim^2,dist.bath_dim))
     W = X*X'
-    W = W/LinearAlgebra.tr(W)
-    #Y = sqrt(LinearAlgebra.tr(W,[dist.dim,dist.dim],1))
-    #IY = kron(QuantumInfo.eye(dist.dim),Y)
+    W = W/tr(W)
+    #Y = sqrt(tr(W,[dist.dim,dist.dim],1))
+    #IY = kron(eye(dist.dim),Y)
     Y = sqrt(partialtrace(W,[dist.dim,dist.dim],2))
-    IY = kron(Y,QuantumInfo.eye(dist.dim))
+    IY = kron(Y,eye(dist.dim))
     R = IY\W/IY
     return choi2liou(R)/dist.dim
 end
@@ -194,7 +195,7 @@ end
 #       by a Haar random unitary? If so, that should be cheaper
 function rand(dist::RandomClosedEvolution)
     evals,U = eig(rand(GUE(dist.dim)))
-    return U*LinearAlgebra.diagm(0 => exp.(-1im*dist.α*evals))*U'
+    return U*diagm(0 => exp.(-1im*dist.α*evals))*U'
 end
 
 """
@@ -215,10 +216,10 @@ end
 function rand(dist::RandomOpenEvolution)
     d = dist.dim
     de = dist.bath_dim
-    ru = rand(RandomClosedEvolution(d*de,dist.α)) * kron(QuantumInfo.eye(d),ket(0,de))
+    ru = rand(RandomClosedEvolution(d*de,dist.α)) * kron(eye(d),ket(0,de))
     k = Matrix{ComplexF64}[]
     for ii=1:de
-        push!(k, kron(QuantumInfo.eye(d), bra(ii-1,de)) * ru )
+        push!(k, kron(eye(d), bra(ii-1,de)) * ru )
     end
     return kraus2liou(k)
 end

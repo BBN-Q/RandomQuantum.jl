@@ -1,11 +1,10 @@
 using QuantumInfo, RandomQuantum
-import LinearAlgebra
-import StatsBase
-import StatsBase: var
+using LinearAlgebra: svdvals, norm, ishermitian, eigvals
+using StatsBase: var
 
 using Test
 
-trnorm(A) = sum(LinearAlgebra.svdvals(A))
+trnorm(A) = sum(svdvals(A))
 
 @testset "Randomized GinUE tests" begin
 for _ in 1:10
@@ -23,7 +22,7 @@ for _ in 1:10
     ψ = rand(FubiniStudyPureState(d))
     @test var(real(ψ)) > 0
     @test var(imag(ψ)) > 0
-    @test isapprox(LinearAlgebra.norm(ψ), 1.0)
+    @test isapprox(norm(ψ), 1.0)
 end
 end
 
@@ -33,7 +32,7 @@ for _ in 1:10
     db = rand(2:10)
     ρ = rand(FubiniStudyMixedState(d,db))
     @test isapprox(trnorm(ρ), 1)
-    @test LinearAlgebra.ishermitian(ρ)
+    @test ishermitian(ρ)
     @test ispossemidef(ρ)
     @test var(vec(real(ρ))) > 0
     @test var(vec(imag(ρ))) > 0
@@ -45,7 +44,7 @@ for _ in 1:10
     d = rand(2:10)
     ρ = rand(HilbertSchmidtMixedState(d))
     @test isapprox(trnorm(ρ), 1)
-    @test LinearAlgebra.ishermitian(ρ)
+    @test ishermitian(ρ)
     @test ispossemidef(ρ)
     @test var(vec(real(ρ))) > 0
     @test var(vec(imag(ρ))) > 0
@@ -57,7 +56,7 @@ for _ in 1:10
     d = rand(2:10)
     ρ = rand(BuresMixedState(d))
     @test isapprox(trnorm(ρ), 1)
-    @test LinearAlgebra.ishermitian(ρ)
+    @test ishermitian(ρ)
     @test ispossemidef(ρ)
     @test var(vec(real(ρ))) > 0
     @test var(vec(imag(ρ))) > 0
@@ -70,7 +69,7 @@ for _ in 1:10
     U = rand(ClosedHaarEnsemble(d))
     @test isapprox(U*U', QuantumInfo.eye(d), atol=1e-12)
     @test isapprox(U'*U, QuantumInfo.eye(d), atol=1e-12)
-    @test isapprox(abs.(LinearAlgebra.eigvals(U)),  ones(d), atol=1e-12)
+    @test isapprox(abs.(eigvals(U)),  ones(d), atol=1e-12)
 end
 end
 
@@ -92,7 +91,7 @@ for _ in 1:10
     U = rand(RandomClosedEvolution(d,α))
     @test isapprox(U*U', QuantumInfo.eye(d), atol=1e-12)
     @test isapprox(U'*U, QuantumInfo.eye(d), atol=1e-12)
-    @test isapprox(abs.(LinearAlgebra.eigvals(U)), ones(d), atol=1e-12)
+    @test isapprox(abs.(eigvals(U)), ones(d), atol=1e-12)
 end
 end
 
