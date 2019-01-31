@@ -35,7 +35,7 @@ Install it with the following command:
 	  
 For Julia v1.0 use the master branch:
 
-	  (v1.0) pkg> add RandomQuantum#master
+	  (v1.0) pkg> add RandomQuantum
      
 # Examples
 
