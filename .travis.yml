@@ -1,8 +1,8 @@
 language: julia
 
 os:
-  - osx
   - linux
+  - osx
 
 julia:
   - 1.0
@@ -18,7 +18,7 @@ notifications:
 # uncomment the following lines to override the default test script
 script:
     - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-    - julia --check-bounds=yes --color=yes -e 'using Pkg; Pkg.develop("Cliffords"); Pkg.add(PackageSpec(path=".")); Pkg.build("RandomQuantum"); Pkg.test("RandomQuantum"; coverage=true)'
+    - julia --check-bounds=yes --color=yes -e 'using Pkg; Pkg.develop("Cliffords"); Pkg.build("RandomQuantum"); Pkg.test("RandomQuantum"; coverage=true)'
 
 # necessary to run on new container-based infrastructure
 sudo: false
