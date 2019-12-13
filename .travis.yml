@@ -8,6 +8,9 @@ julia:
   - 1.0
   - nightly
 
+codecov: true
+coveralls: true
+
 matrix:
   allowed_failures:
     - julia: nightly
