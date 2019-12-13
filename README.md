@@ -2,7 +2,7 @@
 
 Linux, OSX: [![Build Status](https://travis-ci.org/BBN-Q/RandomQuantum.jl.svg?branch=master)](https://travis-ci.org/BBN-Q/RandomQuantum.jl)
 &nbsp;
-Windows: [![Build Status](https://ci.appveyor.com/api/projects/status/github/BBN-Q/RandomQuantum.jl?branch=master&svg=true)](https://ci.appveyor.com/project/BBN-Q/randomquantum-jl)
+<!---Windows: [![Build Status](https://ci.appveyor.com/api/projects/status/github/BBN-Q/RandomQuantum.jl?branch=master&svg=true)](https://ci.appveyor.com/project/BBN-Q/randomquantum-jl)--->
 &nbsp; &nbsp; &nbsp;
 [![Coverage Status](https://coveralls.io/repos/BBN-Q/RandomQuantum.jl/badge.svg?branch=master&service=github)](https://coveralls.io/github/BBN-Q/Randomquantum.jl?branch=master)
 [![codecov.io](http://codecov.io/github/BBN-Q/RandomQuantum.jl/coverage.svg?branch=master)](http://codecov.io/github/BBN-Q/RandomQuantum.jl?branch=master)
