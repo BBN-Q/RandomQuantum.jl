@@ -4,7 +4,7 @@ Linux, OSX: [![Build Status](https://travis-ci.org/BBN-Q/RandomQuantum.jl.svg?br
 &nbsp;
 <!---Windows: [![Build Status](https://ci.appveyor.com/api/projects/status/github/BBN-Q/RandomQuantum.jl?branch=master&svg=true)](https://ci.appveyor.com/project/BBN-Q/randomquantum-jl)--->
 &nbsp; &nbsp; &nbsp;
-[![Coverage Status](https://coveralls.io/repos/github/BBN-Q/RandomQuantum.jl/badge.svg)](https://coveralls.io/github/BBN-Q/RandomQuantum.jl)
+[![Coverage Status](https://coveralls.io/repos/github/BBN-Q/RandomQuantum.jl/badge.svg?branch=master)](https://coveralls.io/github/BBN-Q/RandomQuantum.jl?branch=master)
 [![codecov](https://codecov.io/gh/BBN-Q/RandomQuantum.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/BBN-Q/RandomQuantum.jl)
 
 This Julia package provides functions to sample from various random matrix ensebles
