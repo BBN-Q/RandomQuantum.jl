@@ -25,3 +25,7 @@ script:
 
 # necessary to run on new container-based infrastructure
 sudo: false
+
+after_success:
+  - julia -e 'using Pkg; Pkg.add("Coverage"); using Coverage; Codecov.submit(process_folder())'
+  - julia -e 'using Pkg; Pkg.add("Coverage"); using Coverage; Coveralls.submit(process_folder())'
