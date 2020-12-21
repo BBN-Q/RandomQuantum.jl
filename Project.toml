@@ -7,8 +7,11 @@ version = "1.0.0"
 Cliffords = "276b0191-6968-5de0-98fd-2a81b0f3910d"
 QuantumInfo = "bedefb8d-ef00-5401-aa81-ae9c3f6f84cc"
 StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 
 [compat]
+Cliffords = "0.6.0"
+QuantumInfo = "0.2.0"
 julia = "1"
 
 [extras]
