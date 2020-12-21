@@ -1,7 +1,6 @@
 # RandomQuantum
 
-Linux, OSX: [![Build Status](https://travis-ci.org/BBN-Q/RandomQuantum.jl.svg?branch=master)](https://travis-ci.org/BBN-Q/RandomQuantum.jl)
-&nbsp;
+![Build Status](https://github.com/BBN-Q/RandomQuantum.jl/workflows/CI/badge.svg)
 <!---Windows: [![Build Status](https://ci.appveyor.com/api/projects/status/github/BBN-Q/RandomQuantum.jl?branch=master&svg=true)](https://ci.appveyor.com/project/BBN-Q/randomquantum-jl)--->
 &nbsp; &nbsp; &nbsp;
 [![Coverage Status](https://coveralls.io/repos/github/BBN-Q/RandomQuantum.jl/badge.svg?branch=master)](https://coveralls.io/github/BBN-Q/RandomQuantum.jl?branch=master)
