@@ -10,7 +10,7 @@ makedocs(
 )
 
 deploydocs(;
-    repo = "github.com/BBN-Q/RandomQuantum.jl.git",
-    push_preview=true,
+    repo         = "github.com/BBN-Q/RandomQuantum.jl.git",
+    push_preview = false
 )
 
