@@ -11,6 +11,6 @@ makedocs(
 
 deploydocs(;
     repo         = "github.com/BBN-Q/RandomQuantum.jl.git",
-    push_preview = false
+    push_preview = true
 )
 
