@@ -130,10 +130,10 @@ end
 
 function rand(dist::ClosedHaarEnsemble)
     X = rand(GinibreEnsemble(dist.dim))
-    Q,_ = qr(X)
+    Q = qr(X).Q * I # yields dense square matrix
     d = diag(Q)
-    d = d ./ abs.(d)
-    Q = Q ./ d
+    d ./= abs.(d)
+    Q ./= d
     return Q
 end
 
